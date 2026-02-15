@@ -1,6 +1,8 @@
 import { splitString, storageSettings } from '@kinde/js-utils';
 
-export const MAX_COOKIE_LENGTH = storageSettings.maxLength;
+export const getMaxCookieLength = (): number => {
+  return storageSettings.maxLength;
+};
 
 export type SplitCookie = {
   name: string;
@@ -15,7 +17,7 @@ export type SplitCookie = {
 export const getSplitCookies = (
   cookieName: string,
   cookieValue: string,
-  maxCookieLength: number = storageSettings.maxLength
+  maxCookieLength: number = getMaxCookieLength()
 ): SplitCookie[] => {
   if (!Number.isInteger(maxCookieLength) || maxCookieLength <= 0) {
     throw new Error(

@@ -1,13 +1,24 @@
 import {
   getJoinedSplitCookieValue,
+  getMaxCookieLength,
   getSplitCookieNamesToDelete,
   getSplitCookies,
-  MAX_COOKIE_LENGTH,
 } from '../../../sdk/utilities';
 import { storageSettings } from '@kinde/js-utils';
 import { describe, it, expect } from 'vitest';
 
 describe('split-cookies utilities', () => {
+  it('reads max cookie length via accessor from storageSettings', () => {
+    const originalMaxLength = storageSettings.maxLength;
+    storageSettings.maxLength = 7;
+
+    try {
+      expect(getMaxCookieLength()).toBe(7);
+    } finally {
+      storageSettings.maxLength = originalMaxLength;
+    }
+  });
+
   it('reads default max cookie length from storageSettings', () => {
     const originalMaxLength = storageSettings.maxLength;
     storageSettings.maxLength = 4;
@@ -25,7 +36,8 @@ describe('split-cookies utilities', () => {
   });
 
   it('splits a long value into multiple cookies and rejoins it', () => {
-    const original = 'a'.repeat(MAX_COOKIE_LENGTH * 2 + 123);
+    const maxCookieLength = getMaxCookieLength();
+    const original = 'a'.repeat(maxCookieLength * 2 + 123);
     const split = getSplitCookies('access_token', original);
 
     expect(split.length).toBe(3);
