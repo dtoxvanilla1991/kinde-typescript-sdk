@@ -4,9 +4,26 @@ import {
   getSplitCookies,
   MAX_COOKIE_LENGTH,
 } from '../../../sdk/utilities';
+import { storageSettings } from '@kinde/js-utils';
 import { describe, it, expect } from 'vitest';
 
 describe('split-cookies utilities', () => {
+  it('reads default max cookie length from storageSettings', () => {
+    const originalMaxLength = storageSettings.maxLength;
+    storageSettings.maxLength = 4;
+
+    try {
+      const split = getSplitCookies('access_token', 'abcdefghij');
+      expect(split).toEqual([
+        { name: 'access_token', value: 'abcd' },
+        { name: 'access_token1', value: 'efgh' },
+        { name: 'access_token2', value: 'ij' },
+      ]);
+    } finally {
+      storageSettings.maxLength = originalMaxLength;
+    }
+  });
+
   it('splits a long value into multiple cookies and rejoins it', () => {
     const original = 'a'.repeat(MAX_COOKIE_LENGTH * 2 + 123);
     const split = getSplitCookies('access_token', original);
